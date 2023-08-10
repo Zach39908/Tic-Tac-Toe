@@ -1,6 +1,6 @@
 
 let boardSize = 3;
-const Gameboard = ((size) => {
+const Gameboard = ((size, console) => {
     const board = [];
 
     const createBoard = () => {
@@ -21,13 +21,22 @@ const Gameboard = ((size) => {
         console.table(board);
     };
 
-    const setBox = (val, row, col) => {
+    const setBoxValue = (val, row, col) => {
         if(row < 0 || row >= size)
-            alert("ERROR: Cannot set box value (row out of range)");
+            throw new Error("Could not set box value (row out of range)");
         else if(col < 0 || col >= size)
-            alert("ERROR: Cannot set box value (column out of range)");
+            throw new Error("Could not set box value (column out of range)");
         else
             board[row][col] = val;
+    };
+
+    const getBoxValue = (row, col) => {
+        if(row < 0 || row >= size)
+            throw new Error("Could not get box value (row out of range)");
+        else if(col < 0 || col >= size)
+            throw new Error("Could not get box value (column out of range)");
+        else
+            return board[row][col];
     };
 
     createBoard();
@@ -35,13 +44,14 @@ const Gameboard = ((size) => {
     return {
         clearBoard,
         printBoard,
-        setBox,
+        setBoxValue,
+        getBoxValue,
     };
-})(boardSize);
+})(boardSize, console);
 
-const DisplayController = ((document, Gameboard) => {
+const DisplayController = ((document, Gameboard, boardSize) => {
     
-})(document, Gameboard);
+})(document, Gameboard, boardSize);
 
 const Player = () => {
 
