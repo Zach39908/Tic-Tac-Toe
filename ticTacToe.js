@@ -1,6 +1,6 @@
 
 let boardSize = 3;
-const Gameboard = ((size, console) => {
+const Gameboard = ((size) => {
     const board = [];
 
     const createBoard = () => {
@@ -47,13 +47,34 @@ const Gameboard = ((size, console) => {
         setBoxValue,
         getBoxValue,
     };
-})(boardSize, console);
+})(boardSize);
 
-const DisplayController = ((document, Gameboard, boardSize) => {
-    
-})(document, Gameboard, boardSize);
+const DisplayController = ((Gameboard, boardSize) => {
+    const renderBoard = () => {
+        const boardElement = document.getElementById("gameboard");
+        let gridTemplateValue = "";
+
+        for(let i = 0; i < boardSize; i++)
+            gridTemplateValue += "1fr ";
+
+        boardElement.style.gridTemplateRows = boardElement.style.gridTemplateColumns = gridTemplateValue;
+        
+        for(let i = 0; i < boardSize; i++) {
+            for(let j = 0; j < boardSize; j++) {
+                let boxElement = document.createElement("div");
+                boxElement.classList.add("box");
+                boxElement.dataset.row = i;
+                boxElement.dataset.col = j;
+                boardElement.appendChild(boxElement);
+            }
+        }
+    };
+
+    return {
+        renderBoard,
+    }
+})(Gameboard, boardSize);
 
 const Player = () => {
 
 };
-

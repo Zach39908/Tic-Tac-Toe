@@ -4,3 +4,25 @@
     box-sizing: border-box;
 }
 
+body {
+    width: 100vw;
+    height: 100vh;
+}
+
+#gameboard {
+    width: min(95%, 30em);
+    height: 20em;
+    display: grid;
+    border: 1px solid black;
+}
+
+.box {
+    border: 1px solid black;
+}
+
+@media (min-width: 700px) {
+    #gameboard {
+        width: min(75%, 60em);
+        height: 35em;
+    }
+}
