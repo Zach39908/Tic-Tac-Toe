@@ -50,8 +50,9 @@ const Gameboard = ((size) => {
 })(boardSize);
 
 const DisplayController = ((Gameboard, boardSize) => {
+    const boardElement = document.getElementById("gameboard");
+
     const renderBoard = () => {
-        const boardElement = document.getElementById("gameboard");
         let gridTemplateValue = "";
 
         for(let i = 0; i < boardSize; i++)
@@ -65,10 +66,45 @@ const DisplayController = ((Gameboard, boardSize) => {
                 boxElement.classList.add("box");
                 boxElement.dataset.row = i;
                 boxElement.dataset.col = j;
+                let boxContent = document.createElement("span");
+                boxContent.textContent = "";
+                boxElement.appendChild(boxContent);
                 boardElement.appendChild(boxElement);
             }
         }
     };
+
+    function setBoxContent(row, col) {
+        const allBoxes = Array.from(boardElement.querySelectorAll(".box"));
+        const targetBox = allBoxes.find(box => box.dataset.row === row && box.dataset.col === col);
+        
+        try {
+            targetBox.querySelector("span").textContent = Gameboard.getBoxValue(row, col)
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    function handleClick(e) {
+        if(!e.target.classList.contains("box"))
+            return;
+
+        const row = e.target.dataset.row;
+        const col = e.target.dataset.col;
+        try {
+            if(Gameboard.getBoxValue(row, col))
+                return;
+
+            Gameboard.setBoxValue("X", row ,col);
+            setBoxContent(row, col);
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    boardElement.addEventListener("click", handleClick);
 
     return {
         renderBoard,
@@ -78,3 +114,5 @@ const DisplayController = ((Gameboard, boardSize) => {
 const Player = () => {
 
 };
+
+DisplayController.renderBoard();
