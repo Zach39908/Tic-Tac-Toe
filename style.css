@@ -19,11 +19,22 @@ body {
 .box {
     cursor: pointer;
     border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box > div {
+    font-size: 5rem;
 }
 
 @media (min-width: 700px) {
     #gameboard {
         width: min(75%, 60em);
         height: 35em;
+    }
+
+    .box > div {
+        font-size: 7rem;
     }
 }

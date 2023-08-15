@@ -1,15 +1,65 @@
 
-let boardSize = 3;
+const BOARD_SIZE = 3;
+
+
+const Player = (name, gamepiece) => {
+    if(gamepiece.length !== 1)
+        throw new Error("Invalid gamepiece. Must be a single character");
+
+    let active = false;
+
+    const getGamePiece = () => {
+        return gamepiece;
+    };
+
+    const getName = () => {
+        return name;
+    }
+
+    return {
+        active,
+        getGamePiece,
+        getName,
+    };
+};
+
+
+let playerOne = null;
+let playerTwo = null;
+
+try {
+    playerOne = Player("Player 1", "X");
+    playerTwo = Player("Player 2", "O");
+}
+catch(err) {
+    console.error(err);
+    console.log("Creating default players...");
+    playerOne = Player("Player 1", "X");
+    playerTwo = Player("Player 2", "O");
+}
+
+
 const Gameboard = ((size) => {
     const board = [];
 
-    const createBoard = () => {
+    function _createBoard() {
         for(let i = 0; i < size; i++) {
             board.push([]);
             for(let j = 0; j < size; j++)
                 board[i].push("");
         }
-    };
+    }
+
+    function _boardIsFull() {
+        for(let i = 0; i < size; i++) {
+            for(let j = 0; j < size; j++) {
+                if(!board[i][j])
+                    return false;
+            }
+        }
+
+        return true;
+    }
 
     const clearBoard = () => {
         for(let i = 0; i < size; i++)
@@ -21,13 +71,13 @@ const Gameboard = ((size) => {
         console.table(board);
     };
 
-    const setBoxValue = (val, row, col) => {
+    const setBoxValue = (player, row, col) => {
         if(row < 0 || row >= size)
             throw new Error("Could not set box value (row out of range)");
         else if(col < 0 || col >= size)
             throw new Error("Could not set box value (column out of range)");
         else
-            board[row][col] = val;
+            return board[row][col] = player.getGamePiece();
     };
 
     const getBoxValue = (row, col) => {
@@ -39,26 +89,62 @@ const Gameboard = ((size) => {
             return board[row][col];
     };
 
-    createBoard();
+    const checkWinner = (playerOne, playerTwo) => {
+        let cols = [];
+        let rows = [];
+        let diags = [[], []];
+        let plOnePieces = [];
+        let plTwoPieces = [];
+
+        for(let i = 0; i < size; i++) {
+            plOnePieces.push(playerOne.getGamePiece());
+            plTwoPieces.push(playerTwo.getGamePiece());
+            cols.push(board.map(row => row[i]));
+            diags[0].push(board[i][i]);
+            diags[1].push(board[i][board.length - 1 - i]);
+        }
+
+        plOnePieces = plOnePieces.toString();
+        plTwoPieces = plTwoPieces.toString();
+        cols = cols.map(col => col.toString());
+        rows = board.map(row => row.toString());
+        diags = diags.map(diag => diag.toString());
+
+        if(cols.includes(plOnePieces) || rows.includes(plOnePieces) || diags.includes(plOnePieces))
+            return playerOne;
+        if(cols.includes(plTwoPieces) || rows.includes(plTwoPieces) || diags.includes(plTwoPieces))
+            return playerTwo;
+        if(_boardIsFull())
+            return "Tie";
+
+        return "";
+    };
+
+    _createBoard();
 
     return {
         clearBoard,
         printBoard,
         setBoxValue,
         getBoxValue,
+        checkWinner,
     };
-})(boardSize);
+})(BOARD_SIZE);
 
-const DisplayController = ((Gameboard, boardSize) => {
-    const boardElement = document.getElementById("gameboard");
 
-    const renderBoard = () => {
+const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
+    const _boardElement = document.getElementById("gameboard");
+    const _startBtn = document.getElementById("start-game");
+    let gameOver = true;
+
+
+    function _renderBoard() {
         let gridTemplateValue = "";
 
         for(let i = 0; i < boardSize; i++)
             gridTemplateValue += "1fr ";
 
-        boardElement.style.gridTemplateRows = boardElement.style.gridTemplateColumns = gridTemplateValue;
+        _boardElement.style.gridTemplateRows = _boardElement.style.gridTemplateColumns = gridTemplateValue;
         
         for(let i = 0; i < boardSize; i++) {
             for(let j = 0; j < boardSize; j++) {
@@ -66,53 +152,65 @@ const DisplayController = ((Gameboard, boardSize) => {
                 boxElement.classList.add("box");
                 boxElement.dataset.row = i;
                 boxElement.dataset.col = j;
-                let boxContent = document.createElement("span");
-                boxContent.textContent = "";
+                let boxContent = document.createElement("div");
                 boxElement.appendChild(boxContent);
-                boardElement.appendChild(boxElement);
+                _boardElement.appendChild(boxElement);
             }
         }
     };
 
-    function setBoxContent(row, col) {
-        const allBoxes = Array.from(boardElement.querySelectorAll(".box"));
-        const targetBox = allBoxes.find(box => box.dataset.row === row && box.dataset.col === col);
-        
-        try {
-            targetBox.querySelector("span").textContent = Gameboard.getBoxValue(row, col)
+    function _startGame() {
+        gameOver = false;
+        Gameboard.clearBoard();
+
+        for(let i = 0; i < boardSize; i++) {
+            for(let j = 0; j < boardSize; j++)
+                _setBoxContent("", i, j);
         }
-        catch (err) {
-            console.error(err);
-        }
+
+        playerOne.active = true;
+        playerTwo.active = false;
     }
 
-    function handleClick(e) {
-        if(!e.target.classList.contains("box"))
+    function _setBoxContent(value, row, col) {
+        const allBoxes = Array.from(_boardElement.querySelectorAll(".box"));
+        const targetBox = allBoxes.find(box => box.dataset.row === `${row}` && box.dataset.col === `${col}`);
+        targetBox.querySelector("div").textContent = value;
+    }
+
+    function _handleClick(e) {
+        if(!e.target.classList.contains("box") || gameOver)
             return;
 
+        const activePlayer = playerOne.active ? playerOne : playerTwo;
         const row = e.target.dataset.row;
         const col = e.target.dataset.col;
         try {
             if(Gameboard.getBoxValue(row, col))
                 return;
 
-            Gameboard.setBoxValue("X", row ,col);
-            setBoxContent(row, col);
+            _setBoxContent(Gameboard.setBoxValue(activePlayer, row, col), row, col);
+            const winner = Gameboard.checkWinner(playerOne, playerTwo);
+            
+            if(winner) {
+                if(winner === 'Tie')
+                    console.log("Tie Game!");
+                else
+                    console.log(`${winner.getName()} is the Winner!`);
+
+                gameOver = true;
+            }
+
+            playerOne.active = !playerOne.active;
+            playerTwo.active = !playerTwo.active;
         }
         catch (err) {
             console.error(err);
         }
     }
 
-    boardElement.addEventListener("click", handleClick);
-
-    return {
-        renderBoard,
-    }
-})(Gameboard, boardSize);
-
-const Player = () => {
-
-};
-
-DisplayController.renderBoard();
+    _renderBoard();
+    _startGame();
+    _startBtn.addEventListener('click', _startGame);
+    _boardElement.addEventListener("click", _handleClick);
+})(Gameboard, BOARD_SIZE, playerOne, playerTwo);
