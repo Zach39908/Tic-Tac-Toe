@@ -1,3 +1,13 @@
+:root {
+    --bg-main: rgb(216, 223, 255);
+    --bg-accent: rgba(14, 17, 48, 0.555);
+    --bg-change: rgba(25, 98, 255, 0.616);
+
+    --text-main: rgba(0, 0, 0, 0.884);
+
+    --border-main: black;
+}
+
 *,
 *::before,
 *::after {
@@ -7,18 +17,59 @@
 body {
     width: 100vw;
     height: 100vh;
+    margin: 0;
+    background-color: var(--bg-main);
+}
+
+#game {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+h1 {
+    font-size: 2rem;
+    margin: 0.75em;
+    text-align: center;
+    color: var(--text-main);
+}
+
+#buttons {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.25em;
+}
+
+button {
+    cursor: pointer;
+    padding: 0.75em 2em;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: var(--bg-accent);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgb(44, 43, 43);
+}
+
+button:hover {
+    background-color: var(--bg-change);
 }
 
 #gameboard {
     width: min(95%, 30em);
     height: 20em;
+    flex-shrink: 0;
     display: grid;
-    border: 1px solid black;
+    border: 2px solid var(--border-main);
 }
 
 .box {
     cursor: pointer;
-    border: 1px solid black;
+    border: 2px solid var(--border-main);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,9 +77,18 @@ body {
 
 .box > div {
     font-size: 5rem;
+    color: var(--text-dark);
 }
 
 @media (min-width: 700px) {
+    h1 {
+        font-size: 3rem;
+    }
+
+    #buttons {
+        flex-direction: row;
+    }
+
     #gameboard {
         width: min(75%, 60em);
         height: 35em;

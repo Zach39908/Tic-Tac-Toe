@@ -33,9 +33,6 @@ try {
 }
 catch(err) {
     console.error(err);
-    console.log("Creating default players...");
-    playerOne = Player("Player 1", "X");
-    playerTwo = Player("Player 2", "O");
 }
 
 
@@ -135,8 +132,28 @@ const Gameboard = ((size) => {
 const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
     const _boardElement = document.getElementById("gameboard");
     const _startBtn = document.getElementById("start-game");
+    const _themeBtn = document.getElementById("theme");
     let gameOver = true;
 
+    function _changeTheme(e) {
+        if(e.target.textContent === "Dark Theme") {
+            document.body.style.setProperty("--bg-main", "#232627");
+            document.body.style.setProperty("--bg-accent", "rgba(11, 14, 38, 0.56)");
+            document.body.style.setProperty("--bg-change", "rgba(0, 60, 189, 0.62)");
+            document.body.style.setProperty("--text-main", "rgba(232, 230, 227, 0.88)");
+            document.body.style.setProperty("--border-main", "#8c8273");
+            e.target.textContent = "Light Theme";
+        }
+        else {
+            document.body.style.setProperty("--bg-main", "rgb(216, 223, 255)");
+            document.body.style.setProperty("--bg-accent", "rgba(14, 17, 48, 0.555)");
+            document.body.style.setProperty("--bg-change", "rgba(25, 98, 255, 0.616))");
+            document.body.style.setProperty("--text-main", "rgba(0, 0, 0, 0.884)");
+            document.body.style.setProperty("--border-main", "black");
+            e.target.textContent = "Dark Theme";
+        }
+        
+    }
 
     function _renderBoard() {
         let gridTemplateValue = "";
@@ -193,7 +210,7 @@ const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
             const winner = Gameboard.checkWinner(playerOne, playerTwo);
             
             if(winner) {
-                if(winner === 'Tie')
+                if(winner === "Tie")
                     console.log("Tie Game!");
                 else
                     console.log(`${winner.getName()} is the Winner!`);
@@ -210,7 +227,7 @@ const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
     }
 
     _renderBoard();
-    _startGame();
-    _startBtn.addEventListener('click', _startGame);
+    _startBtn.addEventListener("click", _startGame);
+    _themeBtn.addEventListener("click", _changeTheme);
     _boardElement.addEventListener("click", _handleClick);
 })(Gameboard, BOARD_SIZE, playerOne, playerTwo);
