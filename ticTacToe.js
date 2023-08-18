@@ -24,18 +24,6 @@ const Player = (name, gamepiece) => {
 };
 
 
-let playerOne = null;
-let playerTwo = null;
-
-try {
-    playerOne = Player("Player 1", "X");
-    playerTwo = Player("Player 2", "O");
-}
-catch(err) {
-    console.error(err);
-}
-
-
 const Gameboard = ((size) => {
     const board = [];
 
@@ -129,10 +117,14 @@ const Gameboard = ((size) => {
 })(BOARD_SIZE);
 
 
-const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
+const GameController = ((Gameboard, boardSize) => {
     const _boardElement = document.getElementById("gameboard");
+    const _playerForm = document.querySelector("form");
+    _playerForm.style.display = "none";
     const _startBtn = document.getElementById("start-game");
     const _themeBtn = document.getElementById("theme");
+    let playerOne = null;
+    let playerTwo = null;
     let gameOver = true;
 
     function _changeTheme(e) {
@@ -140,7 +132,9 @@ const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
             document.body.style.setProperty("--bg-main", "#232627");
             document.body.style.setProperty("--bg-accent", "rgba(11, 14, 38, 0.56)");
             document.body.style.setProperty("--bg-change", "rgba(0, 60, 189, 0.62)");
+            document.body.style.setProperty("--bg-accent-2", "rgb(80, 112, 255)");
             document.body.style.setProperty("--text-main", "rgba(232, 230, 227, 0.88)");
+            document.body.style.setProperty("--text-accent", "#ffffffe3");
             document.body.style.setProperty("--border-main", "#8c8273");
             e.target.textContent = "Light Theme";
         }
@@ -148,7 +142,9 @@ const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
             document.body.style.setProperty("--bg-main", "rgb(216, 223, 255)");
             document.body.style.setProperty("--bg-accent", "rgba(14, 17, 48, 0.555)");
             document.body.style.setProperty("--bg-change", "rgba(25, 98, 255, 0.616))");
+            document.body.style.setProperty("--bg-accent-2", "rgb(54, 54, 54)");
             document.body.style.setProperty("--text-main", "rgba(0, 0, 0, 0.884)");
+            document.body.style.setProperty("--text-accent", "rgb(255, 101, 101)");
             document.body.style.setProperty("--border-main", "black");
             e.target.textContent = "Dark Theme";
         }
@@ -177,7 +173,6 @@ const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
     };
 
     function _startGame() {
-        gameOver = false;
         Gameboard.clearBoard();
 
         for(let i = 0; i < boardSize; i++) {
@@ -185,8 +180,30 @@ const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
                 _setBoxContent("", i, j);
         }
 
-        playerOne.active = true;
-        playerTwo.active = false;
+        _playerForm.style.display = "initial";
+        _playerForm.addEventListener("submit", e => {
+            e.preventDefault();
+            const plOneName = _playerForm.querySelector('input[name="player1-name"]').value;
+            const plTwoName = _playerForm.querySelector('input[name="player2-name"]').value;
+            playerOne = _createPlayer(plOneName, "X");
+            playerTwo = _createPlayer(plTwoName, "O");
+            _playerForm.style.display = "none";
+            gameOver = false;
+        });
+    }
+
+    function _createPlayer(name, gamepiece, playerOne = true) {
+        try {
+            const player = Player(name, gamepiece);
+            
+            if(playerOne)
+                player.active = true;
+
+            return player;
+        }
+        catch(err) {
+            console.error(err);
+        }
     }
 
     function _setBoxContent(value, row, col) {
@@ -230,4 +247,4 @@ const GameController = ((Gameboard, boardSize, playerOne, playerTwo) => {
     _startBtn.addEventListener("click", _startGame);
     _themeBtn.addEventListener("click", _changeTheme);
     _boardElement.addEventListener("click", _handleClick);
-})(Gameboard, BOARD_SIZE, playerOne, playerTwo);
+})(Gameboard, BOARD_SIZE);

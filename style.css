@@ -2,8 +2,10 @@
     --bg-main: rgb(216, 223, 255);
     --bg-accent: rgba(14, 17, 48, 0.555);
     --bg-change: rgba(25, 98, 255, 0.616);
+    --bg-accent-2: rgb(54, 54, 54);
 
     --text-main: rgba(0, 0, 0, 0.884);
+    --text-accent: rgb(255, 101, 101);
 
     --border-main: black;
 }
@@ -23,22 +25,51 @@ body {
 
 /* Form Styling Here */
 form {
-    width: 70%;
+    width: 90%;
     max-height: 50%;
+    padding: 2em;
+    position: absolute;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto;
+    grid-template-columns: 1fr 1fr;
+    top: 30%;
+    left: calc(50% - 90% / 2);
+    background-color: var(--bg-accent-2);
+    border: 2px solid var(--border-main);
+    border-radius: 7px;
 }
 
-label.player-name,
-label.player-piece {
-    color: var(--text-main);
-    grid-column: 1/2;
+form > * {
+    margin: 0.5em;
 }
 
-input.player-name,
-input.player-piece {
-    color: var(--text-main);
+label {
+    color: var(--text-accent);
+    font-size: 1.15rem;
+    font-weight: 900;
+}
+
+label[for="player1-name"],
+label[for="player2-name"] {
+    grid-column: 1/3;
+}
+
+.player-name {
+    width: 100%;
+    grid-column: 1/3;
+}
+
+.pieces {
+    grid-column: 2/3;
+}
+
+.player-piece {
+    color: black;
+}
+
+input[type="submit"] {
+    grid-column: 1/3;
+    width: 35%;
 }
 
 #game {
@@ -101,6 +132,11 @@ button:hover {
 }
 
 @media (min-width: 700px) {
+    form {
+        width: 30em;
+        left: calc(50% - 30em / 2);
+    }
+
     h1 {
         font-size: 3rem;
     }
