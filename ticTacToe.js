@@ -125,7 +125,7 @@ const GameController = ((Gameboard, boardSize) => {
     _playerForm.style.display = "none";
     const _startBtn = document.getElementById("start-game");
     const _themeBtn = document.getElementById("theme");
-    const _showWinner = document.getElementById("display");
+    const _gameDisplay = document.getElementById("display");
     let playerOne = null;
     let playerTwo = null;
     let gameOver = true;
@@ -221,7 +221,7 @@ const GameController = ((Gameboard, boardSize) => {
 
             plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-main)";
             _playerForm.style.display = "none";
-            _showWinner.style.display = "none";
+            _gameDisplay.textContent = `${playerOne.getName()}'s Turn...`;
             gameOver = false;
         });
     }
@@ -251,23 +251,33 @@ const GameController = ((Gameboard, boardSize) => {
         if(!e.target.classList.contains("box") || gameOver)
             return;
 
-        const activePlayer = playerOne.active ? playerOne : playerTwo;
         const row = e.target.dataset.row;
         const col = e.target.dataset.col;
         try {
             if(Gameboard.getBoxValue(row, col))
                 return;
 
+            let activePlayer = null;
+
+            if(playerOne.active) {
+                activePlayer = playerOne;
+                _gameDisplay.textContent = `${playerTwo.getName()}'s Turn...`;
+            }
+            else {
+                activePlayer = playerTwo;
+                _gameDisplay.textContent = `${playerOne.getName()}'s Turn...`;
+            }
+
             _setBoxContent(Gameboard.setBoxValue(activePlayer, row, col), row, col);
             const winner = Gameboard.checkWinner(playerOne, playerTwo);
             
             if(winner) {
-                _showWinner.style.display = "initial";
+                _gameDisplay.style.display = "initial";
 
                 if(winner === "Tie")
-                    _showWinner.textContent = "Tie Game!";
+                    _gameDisplay.textContent = "Tie Game!";
                 else
-                    _showWinner.textContent = `${winner.getName()} is the Winner!`;
+                    _gameDisplay.textContent = `${winner.getName()} is the Winner!`;
 
                 gameOver = true;
             }
