@@ -5,6 +5,8 @@ const BOARD_SIZE = 3;
 const Player = (name, gamepiece) => {
     if(gamepiece.length !== 1)
         throw new Error("Invalid gamepiece. Must be a single character");
+    if(!name)
+        throw new Error("Invalid player name.");
 
     let active = false;
 
@@ -123,6 +125,7 @@ const GameController = ((Gameboard, boardSize) => {
     _playerForm.style.display = "none";
     const _startBtn = document.getElementById("start-game");
     const _themeBtn = document.getElementById("theme");
+    const _display = document.getElementById("display");
     let playerOne = null;
     let playerTwo = null;
     let gameOver = true;
@@ -148,7 +151,6 @@ const GameController = ((Gameboard, boardSize) => {
             document.body.style.setProperty("--border-main", "black");
             e.target.textContent = "Dark Theme";
         }
-        
     }
 
     function _renderBoard() {
@@ -181,13 +183,51 @@ const GameController = ((Gameboard, boardSize) => {
         }
 
         _playerForm.style.display = "initial";
+        const plOnePieces = Array.from(_playerForm.querySelectorAll('input[name="player1-piece"]'));
+        const plTwoPieces = Array.from(_playerForm.querySelectorAll('input[name="player2-piece"]'));
+        let plOnePiece = null;
+        let plTwoPiece = null;
+        let piecesSet = false;
+
+        plOnePieces.forEach(piece => piece.addEventListener("click", e => {
+            if(piecesSet)
+                return;
+
+            plOnePiece = e.target;
+            plTwoPiece = plTwoPieces[(plOnePieces.indexOf(plOnePiece) + 1) % 2];
+            plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-accent)";
+            piecesSet = true;
+        }));
+
+        plTwoPieces.forEach(piece => piece.addEventListener("click", e => {
+            if(piecesSet)
+                return;
+
+            plTwoPiece = e.target;
+            plOnePiece = plOnePieces[(plTwoPieces.indexOf(plTwoPiece) + 1) % 2];
+            plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-accent)";
+            piecesSet = true;
+        }));
+
         _playerForm.addEventListener("submit", e => {
             e.preventDefault();
             const plOneName = _playerForm.querySelector('input[name="player1-name"]').value;
             const plTwoName = _playerForm.querySelector('input[name="player2-name"]').value;
-            playerOne = _createPlayer(plOneName, "X");
-            playerTwo = _createPlayer(plTwoName, "O");
+
+            if(plOnePiece.value === plTwoPiece.value) {
+                console.err("Cannot select the same piece for both players");
+                return;
+            }
+
+            playerOne = _createPlayer(plOneName, plOnePiece.value);
+            playerTwo = _createPlayer(plTwoName, plTwoPiece.value);
+
+            if(!playerOne || !playerTwo)
+                return;
+
+            plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-main)";
             _playerForm.style.display = "none";
+            _display.style.display = "none";
             gameOver = false;
         });
     }
@@ -203,6 +243,7 @@ const GameController = ((Gameboard, boardSize) => {
         }
         catch(err) {
             console.error(err);
+            return null;
         }
     }
 
@@ -227,10 +268,12 @@ const GameController = ((Gameboard, boardSize) => {
             const winner = Gameboard.checkWinner(playerOne, playerTwo);
             
             if(winner) {
+                _display.style.display = "initial";
+
                 if(winner === "Tie")
-                    console.log("Tie Game!");
+                    _display.textContent = "Tie Game!";
                 else
-                    console.log(`${winner.getName()} is the Winner!`);
+                    _display.textContent = `${winner.getName()} is the Winner!`;
 
                 gameOver = true;
             }
