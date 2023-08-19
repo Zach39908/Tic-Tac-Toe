@@ -125,7 +125,7 @@ const GameController = ((Gameboard, boardSize) => {
     _playerForm.style.display = "none";
     const _startBtn = document.getElementById("start-game");
     const _themeBtn = document.getElementById("theme");
-    const _display = document.getElementById("display");
+    const _showWinner = document.getElementById("display");
     let playerOne = null;
     let playerTwo = null;
     let gameOver = true;
@@ -213,7 +213,6 @@ const GameController = ((Gameboard, boardSize) => {
             e.preventDefault();
             const plOneName = _playerForm.querySelector('input[name="player1-name"]').value;
             const plTwoName = _playerForm.querySelector('input[name="player2-name"]').value;
-
             playerOne = _createPlayer(plOneName, plOnePiece.value);
             playerTwo = _createPlayer(plTwoName, plTwoPiece.value);
 
@@ -222,7 +221,7 @@ const GameController = ((Gameboard, boardSize) => {
 
             plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-main)";
             _playerForm.style.display = "none";
-            _display.style.display = "none";
+            _showWinner.style.display = "none";
             gameOver = false;
         });
     }
@@ -263,12 +262,12 @@ const GameController = ((Gameboard, boardSize) => {
             const winner = Gameboard.checkWinner(playerOne, playerTwo);
             
             if(winner) {
-                _display.style.display = "initial";
+                _showWinner.style.display = "initial";
 
                 if(winner === "Tie")
-                    _display.textContent = "Tie Game!";
+                    _showWinner.textContent = "Tie Game!";
                 else
-                    _display.textContent = `${winner.getName()} is the Winner!`;
+                    _showWinner.textContent = `${winner.getName()} is the Winner!`;
 
                 gameOver = true;
             }
