@@ -3,8 +3,6 @@ const BOARD_SIZE = 3;
 
 
 const Player = (name, gamepiece) => {
-    if(gamepiece.length !== 1)
-        throw new Error("Invalid gamepiece. Must be a single character");
     if(!name)
         throw new Error("Invalid player name.");
 
@@ -185,28 +183,24 @@ const GameController = ((Gameboard, boardSize) => {
         _playerForm.style.display = "initial";
         const plOnePieces = Array.from(_playerForm.querySelectorAll('input[name="player1-piece"]'));
         const plTwoPieces = Array.from(_playerForm.querySelectorAll('input[name="player2-piece"]'));
-        let plOnePiece = null;
-        let plTwoPiece = null;
-        let piecesSet = false;
+        let plOnePiece = plOnePieces[0];
+        let plTwoPiece = plTwoPieces[1];
+        plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-accent)";
 
         plOnePieces.forEach(piece => piece.addEventListener("click", e => {
-            if(piecesSet)
-                return;
-
+            plOnePieces.forEach(piece => piece.style.backgroundColor = "var(--bg-main)");
+            plTwoPieces.forEach(piece => piece.style.backgroundColor = "var(--bg-main)");
             plOnePiece = e.target;
             plTwoPiece = plTwoPieces[(plOnePieces.indexOf(plOnePiece) + 1) % 2];
             plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-accent)";
-            piecesSet = true;
         }));
 
         plTwoPieces.forEach(piece => piece.addEventListener("click", e => {
-            if(piecesSet)
-                return;
-
+            plOnePieces.forEach(piece => piece.style.backgroundColor = "var(--bg-main)");
+            plTwoPieces.forEach(piece => piece.style.backgroundColor = "var(--bg-main)");
             plTwoPiece = e.target;
             plOnePiece = plOnePieces[(plTwoPieces.indexOf(plTwoPiece) + 1) % 2];
             plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-accent)";
-            piecesSet = true;
         }));
 
         _playerForm.addEventListener("submit", e => {
@@ -219,8 +213,9 @@ const GameController = ((Gameboard, boardSize) => {
             if(!playerOne || !playerTwo)
                 return;
 
-            plOnePiece.style.backgroundColor = plTwoPiece.style.backgroundColor = "var(--bg-main)";
             _playerForm.style.display = "none";
+            plOnePieces.forEach(piece => piece.style.backgroundColor = "var(--bg-main)");
+            plTwoPieces.forEach(piece => piece.style.backgroundColor = "var(--bg-main)");
             _gameDisplay.textContent = `${playerOne.getName()}'s Turn...`;
             gameOver = false;
         });
@@ -237,6 +232,9 @@ const GameController = ((Gameboard, boardSize) => {
         }
         catch(err) {
             console.error(err);
+            _gameDisplay.style.display = "initial";
+            _gameDisplay.textContent = err;
+            gameOver = true;
             return null;
         }
     }
