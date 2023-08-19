@@ -175,11 +175,11 @@ const GameController = ((Gameboard, boardSize) => {
     };
 
     function _startGame() {
-        Gameboard.clearBoard();
+        Gameboard.clearBoard(); // clearing board data structure
 
         for(let i = 0; i < boardSize; i++) {
             for(let j = 0; j < boardSize; j++)
-                _setBoxContent("", i, j);
+                _setBoxContent("", i, j); // clearing DOM board
         }
 
         _playerForm.style.display = "initial";
@@ -213,11 +213,6 @@ const GameController = ((Gameboard, boardSize) => {
             e.preventDefault();
             const plOneName = _playerForm.querySelector('input[name="player1-name"]').value;
             const plTwoName = _playerForm.querySelector('input[name="player2-name"]').value;
-
-            if(plOnePiece.value === plTwoPiece.value) {
-                console.err("Cannot select the same piece for both players");
-                return;
-            }
 
             playerOne = _createPlayer(plOneName, plOnePiece.value);
             playerTwo = _createPlayer(plTwoName, plTwoPiece.value);
